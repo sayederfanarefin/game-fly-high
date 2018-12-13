@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>Event sheet 1</name>
+    <events>
+        <variable comment="The total distance flown so far, in pixels." constant="0" name="TotalDistance" sid="4015867643157149" static="0" type="number">0</variable>
+        <variable comment="The X co-ordinate where to create the next block" constant="0" name="NextBlockX" sid="5327114571015895" static="0" type="number">665</variable>
+        <variable comment="The Y co-ordinate to slide the top block spawner to." constant="0" name="TopSpawnerTargetY" sid="3439610980831968" static="0" type="number">40</variable>
+        <variable comment="The Y co-ordinate to slide the bottom spawner to." constant="0" name="BottomSpawnerTargetY" sid="726966054651142" static="0" type="number">308</variable>
+        <comment>Make sure everything moves left across the screen (since the default 0 degrees is right)</comment>
+        <event-block sid="4183837126602792">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="955088681619798" type="System" />
+            </conditions>
+            <actions>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="2752486826635685" type="TiledBackground">
+                    <param id="0" name="Angle">180</param>
+                </action>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="8317104790204248" type="Block">
+                    <param id="0" name="Angle">180</param>
+                </action>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="7041361615359606" type="Car">
+                    <param id="0" name="Angle">180</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Wrap the scrolling background infinitely by moving it back after it&apos;s scrolled the width of the main image to the left.</comment>
+        <event-block sid="4901695194915258">
+            <conditions>
+                <condition id="-1" name="Compare X" sid="243316901774439" type="TiledBackground">
+                    <param id="0" name="Comparison">3</param>
+                    <param id="1" name="X co-ordinate">-Self.Width / 2</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-1" name="Set X" sid="2179266091062072" type="TiledBackground">
+                    <param id="0" name="X">Self.X + Self.Width / 2</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Keep incrementing the current and total distances, and display the total distance in a text object. Move the next block to create position to the left at the same speed the blocks are travelling at.</comment>
+        <event-block sid="4253018152795163">
+            <conditions>
+                <condition id="-1" name="Every tick" sid="2604115586417575" type="System" />
+            </conditions>
+            <actions>
+                <action id="-10" name="Add to" sid="8876768676174938" type="System">
+                    <param id="0" name="Variable">TotalDistance</param>
+                    <param id="1" name="Value">Block.Bullet.Speed * dt</param>
+                </action>
+                <action id="-11" name="Subtract from" sid="9086746396162457" type="System">
+                    <param id="0" name="Variable">NextBlockX</param>
+                    <param id="1" name="Value">Block.Bullet.Speed * dt</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="6384751921016593">
+            <conditions>
+                <condition id="-6" name="Every X seconds" sid="310284521710728" type="System">
+                    <param id="0" name="Interval (seconds)">0.25</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Set text" sid="9060271483953864" type="DistanceDisplay">
+                    <param id="0" name="Text">round(TotalDistance)</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Once the position of the NextBlockX comes on-screen, it is time to create a new block. Create one by both the top and bottom spawners, and then move the next block position back to the right by a block width.</comment>
+        <event-block sid="8472449884865165">
+            <conditions>
+                <condition id="-14" name="Compare variable" sid="1221211516252535" type="System">
+                    <param id="0" name="Variable">NextBlockX</param>
+                    <param id="1" name="Comparison">3</param>
+                    <param id="2" name="Value">LayoutWidth</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-10" name="Add to" sid="4243493428434381" type="System">
+                    <param id="0" name="Variable">NextBlockX</param>
+                    <param id="1" name="Value">Block.Width</param>
+                </action>
+                <action id="-3" name="Create object" sid="5832322299833301" type="System">
+                    <param id="0" name="Object to create">Block</param>
+                    <param id="1" name="Layer">&quot;Game&quot;</param>
+                    <param id="2" name="X">NextBlockX</param>
+                    <param id="3" name="Y">BottomSpawner.Y</param>
+                </action>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="8860345936452065" type="Block">
+                    <param id="0" name="Angle">180</param>
+                </action>
+                <action id="-3" name="Create object" sid="2983114908923726" type="System">
+                    <param id="0" name="Object to create">Block</param>
+                    <param id="1" name="Layer">&quot;Game&quot;</param>
+                    <param id="2" name="X">NextBlockX</param>
+                    <param id="3" name="Y">TopSpawner.Y - Block.Height</param>
+                </action>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="5487845817932556" type="Block">
+                    <param id="0" name="Angle">180</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Destroy objects that go off the left of the screen so they don&apos;t keep taking up memory or CPU.</comment>
+        <event-block sid="8947566349427732">
+            <conditions>
+                <condition id="-1" name="Compare X" sid="6241722876341016" type="Block">
+                    <param id="0" name="Comparison">2</param>
+                    <param id="1" name="X co-ordinate">-Self.Width</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Destroy" sid="8331677903348602" type="Block" />
+            </actions>
+        </event-block>
+        <event-block sid="7413881295979181">
+            <conditions>
+                <condition id="-1" name="Compare X" sid="9100096579619525" type="Car">
+                    <param id="0" name="Comparison">2</param>
+                    <param id="1" name="X co-ordinate">-Self.Width</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Destroy" sid="1440413197584515" type="Car" />
+            </actions>
+        </event-block>
+        <comment>If the player falls off the bottom of the screen or hits an obstacle, restart the game.</comment>
+        <event-block any="1" sid="8029594871088893">
+            <conditions>
+                <condition id="-3" inverted="1" name="Is on-screen" sid="3891402514105674" type="Player" />
+                <condition id="1" name="Is overlapping another object" sid="3268957067651103" type="Player">
+                    <param id="0" name="Object">Block</param>
+                </condition>
+                <condition id="1" name="Is overlapping another object" sid="6082236182021774" type="Player">
+                    <param id="0" name="Object">Car</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-21" name="Reset global variables" sid="4956800703100719" type="System" />
+                <action id="-26" name="Restart layout" sid="2073033970558668" type="System" />
+            </actions>
+        </event-block>
+        <comment>Make the player fall down unless we&apos;re touching the screen (or holding space), in which case accelerate them upwards.</comment>
+        <event-block any="1" sid="9234784188668333">
+            <conditions>
+                <condition id="2" name="Is in touch" sid="3949683883546242" type="Touch" />
+                <condition id="2" name="Key is down" sid="9858944201141429" type="Keyboard">
+                    <param id="0" name="Key">32 (Space)</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action behavior="CustomMovement" id="3" name="Accelerate" sid="6722068397895388" type="Player">
+                    <param id="0" name="Which">2</param>
+                    <param id="1" name="Acceleration">-300</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="3300314078748617">
+            <conditions>
+                <condition id="-22" name="Else" sid="6093573010861637" type="System" />
+            </conditions>
+            <actions>
+                <action behavior="CustomMovement" id="3" name="Accelerate" sid="6913827940169972" type="Player">
+                    <param id="0" name="Which">2</param>
+                    <param id="1" name="Acceleration">300</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Every 3 seconds change the target positions for the top and bottom spawners, and create a car obstacle between the spawners. Move the spawners slowly to their target positions using the Bullet behavior.</comment>
+        <event-block sid="9550552744272268">
+            <conditions>
+                <condition id="-6" name="Every X seconds" sid="2428439987965399" type="System">
+                    <param id="0" name="Interval (seconds)">3</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="5930125933111981" type="System">
+                    <param id="0" name="Variable">TopSpawnerTargetY</param>
+                    <param id="1" name="Value">10 + random(140)</param>
+                </action>
+                <action id="-9" name="Set value" sid="9412943721530512" type="System">
+                    <param id="0" name="Variable">BottomSpawnerTargetY</param>
+                    <param id="1" name="Value">LayoutHeight - 10 - random(140)</param>
+                </action>
+                <action id="-3" name="Create object" sid="902569345590864" type="System">
+                    <param id="0" name="Object to create">Car</param>
+                    <param id="1" name="Layer">&quot;Game&quot;</param>
+                    <param id="2" name="X">700</param>
+                    <param id="3" name="Y">random(TopSpawner.Y, BottomSpawner.Y)</param>
+                </action>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="3752676017994446" type="Car">
+                    <param id="0" name="Angle">180</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="6625097159697283">
+            <conditions>
+                <condition id="-1" name="Every tick" sid="7264893038106845" type="System" />
+            </conditions>
+            <actions>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="3365451695593123" type="TopSpawner">
+                    <param id="0" name="Angle">angle(Self.X, Self.Y, Self.X, TopSpawnerTargetY)</param>
+                </action>
+                <action behavior="Bullet" id="3" name="Set angle of motion" sid="7843323627294521" type="BottomSpawner">
+                    <param id="0" name="Angle">angle(Self.X, Self.Y, Self.X, BottomSpawnerTargetY)</param>
+                </action>
+                <action id="-24" name="Move to top" sid="8332615651950919" type="Car" />
+            </actions>
+        </event-block>
+    </events>
+</c2eventsheet>
